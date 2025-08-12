@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../core/api.service';
 import { ToastService } from '../shared/toast.service';
@@ -8,7 +9,7 @@ import { ToastService } from '../shared/toast.service';
 @Component({
   standalone: true,
   selector: 'app-restaurant-workspace',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MultiSelectModule],
   template: `
   <section class="max-w-7xl mx-auto p-4 space-y-6" *ngIf="slug">
     <div class="flex items-center justify-between">
@@ -106,16 +107,18 @@ import { ToastService } from '../shared/toast.service';
         <label class="lg:col-span-3 text-sm">Price (C1)
           <input type="number" step="0.01" class="mt-1 w-full px-3 py-2 rounded bg-black/40 border border-white/10" [(ngModel)]="prodModel.price_currency_1"/>
         </label>
-        <label class="lg:col-span-3 text-sm">Categories
-          <select class="mt-1 w-full px-3 py-2 rounded bg-black/40 border border-white/10" [(ngModel)]="prodModel.category_ids" multiple>
-            <option *ngFor="let c of categories" [value]="c.id">{{c.name}}</option>
-          </select>
-        </label>
-        <label class="lg:col-span-3 text-sm">Ingredients
-          <select class="mt-1 w-full px-3 py-2 rounded bg-black/40 border border-white/10" [(ngModel)]="prodModel.ingredient_ids" multiple>
-            <option *ngFor="let i of ingredients" [value]="i.id">{{i.name}}</option>
-          </select>
-        </label>
+        <div class="lg:col-span-3 text-sm">
+          <div class="mb-1">Categories</div>
+          <p-multiSelect [options]="categories" optionLabel="name" optionValue="id"
+                         [(ngModel)]="prodModel.category_ids" display="chip" [showClear]="true"
+                         defaultLabel="Select categories" [filter]="true" [appendTo]="'body'"></p-multiSelect>
+        </div>
+        <div class="lg:col-span-3 text-sm">
+          <div class="mb-1">Ingredients</div>
+          <p-multiSelect [options]="ingredients" optionLabel="name" optionValue="id"
+                         [(ngModel)]="prodModel.ingredient_ids" display="chip" [showClear]="true"
+                         defaultLabel="Select ingredients" [filter]="true" [appendTo]="'body'"></p-multiSelect>
+        </div>
       </div>
       <div class="flex items-center gap-2">
         <button class="px-3 py-2 rounded bg-[var(--luxury-gold)] text-black" (click)="saveProduct()">{{prodModel.id? 'Update':'Add'}} product</button>
