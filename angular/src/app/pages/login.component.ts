@@ -24,7 +24,6 @@ import { ToastService } from '../shared/toast.service';
         </div>
         <button class="w-full py-2 rounded bg-[var(--luxury-gold)] text-black font-semibold hover:opacity-90">Login</button>
       </form>
-      <p class="mt-3 text-xs text-white/50">Default: admin / evolusys</p>
     </div>
   </section>
   `
