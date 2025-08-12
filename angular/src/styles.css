@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --luxury-gold:#C9A24B;
+  --luxury-dark:#0F0F0F;
+}
+
+body{
+  @apply text-white font-body bg-[var(--luxury-dark)];
+}
+
+.lux-card{
+  @apply bg-luxury-slate/60 backdrop-blur rounded-xl border border-white/5 shadow-lg;
+}
+
+.lux-title{
+  @apply font-display text-3xl md:text-4xl text-[var(--luxury-gold)] tracking-wide;
+}
+
+/* Multi-select custom styling (no Prime CSS) */
+.p-multiselect { @apply w-full bg-white border border-white/20 rounded text-black font-semibold; }
+.p-multiselect .p-multiselect-label { @apply px-3 py-2 text-black font-semibold; }
+.p-multiselect .p-multiselect-trigger { @apply px-2; }
+.p-multiselect-panel, .dm-overlay { @apply bg-white border border-black/10 shadow-2xl rounded text-black; z-index: 10000 !important; }
+.p-multiselect-items .p-multiselect-item { @apply text-sm text-black hover:bg-black/5 font-semibold; }
+.p-multiselect-items .p-highlight { @apply bg-black/10; }
+.p-multiselect-token { @apply bg-black/10 text-black rounded px-2 py-0.5 font-semibold; }
+.p-multiselect-filter-container { @apply px-2 py-2; }
+.p-multiselect-filter-container input { @apply bg-white border border-black/10 rounded px-2 py-1 text-black; }
+.p-multiselect-close { @apply mr-2; }
+
+/* Ensure overlays sit above app header etc. */
+.p-overlay, .p-multiselect-panel { z-index: 10000 !important; }
+

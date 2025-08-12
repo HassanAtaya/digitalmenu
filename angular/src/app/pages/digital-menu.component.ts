@@ -1,0 +1,53 @@
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ApiService } from '../core/api.service';
+
+@Component({
+  standalone: true,
+  selector: 'app-digital-menu',
+  imports: [CommonModule],
+  template: `
+  <section class="max-w-7xl mx-auto p-4" [style.background]="data?.setting?.background_color || '#0F0F0F'">
+    <div class="flex items-center gap-4 mb-6">
+      <img *ngIf="data?.setting?.logo_path" [src]="data.setting.logo_path" class="h-12">
+      <div>
+        <h1 class="lux-title" [style.color]="data?.setting?.primary_color || '#C9A24B'">{{data?.setting?.company_name || 'Our Menu'}}</h1>
+        <div class="text-white/60 text-xs">{{data?.setting?.currency_1}} • {{data?.setting?.currency_2}}</div>
+      </div>
+      <img *ngIf="data?.setting?.barcode_image_path" [src]="data.setting.barcode_image_path" class="h-12 ml-auto">
+    </div>
+
+    <div class="overflow-x-auto mb-4">
+      <div class="flex gap-3 min-w-max">
+        <button class="px-4 py-2 rounded-full border border-white/10" [style.background]="active===0? (data?.setting?.primary_color || '#C9A24B') : 'transparent'" [class.text-black]="active===0" (click)="active=0">All</button>
+        <button *ngFor="let c of data?.categories" class="px-4 py-2 rounded-full border border-white/10"
+          [style.background]="active===c.id? (data?.setting?.primary_color || '#C9A24B') : 'transparent'" [class.text-black]="active===c.id"
+          (click)="active=c.id">{{c.name}}</button>
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div *ngFor="let cat of data?.categories" class="sm:col-span-2 lg:col-span-3" [hidden]="active && active!==cat.id && active!==0">
+        <h2 class="text-xl font-display mb-2" [style.color]="data?.setting?.primary_color || '#C9A24B'">{{cat.name}}</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <article *ngFor="let p of cat.products" class="lux-card p-4 hover:scale-[1.01] transition">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h3 class="font-semibold text-lg">{{p.name}}</h3>
+                <div class="text-white/60 text-sm">{{p.price_currency_1}} / {{p.price_currency_2}}</div>
+              </div>
+            </div>
+            <div class="mt-2 text-sm text-white/70" *ngIf="p.ingredient_names?.length">Ingredients: {{p.ingredient_names.join(', ')}}</div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+  `
+})
+export class DigitalMenuComponent implements OnInit {
+  private api = inject(ApiService);
+  data: any; active = 0;
+  ngOnInit(): void { this.api.digitalMenu().subscribe(r => this.data = r); }
+}
+
