@@ -19,6 +19,14 @@ body{
   @apply font-display text-3xl md:text-4xl text-[var(--luxury-gold)] tracking-wide;
 }
 
+/* Digital menu responsive full-width grid and compact cards */
+.menu-grid{
+  @apply grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5;
+}
+.lux-card.max-w-sm{ /* narrower visual footprint for menu cards */
+  max-width: 18rem;
+}
+
 /* Multi-select custom styling (no Prime CSS) */
 .p-multiselect { @apply w-full bg-white border border-white/20 rounded text-black font-semibold; }
 .p-multiselect .p-multiselect-label { @apply px-3 py-2 text-black font-semibold; }
