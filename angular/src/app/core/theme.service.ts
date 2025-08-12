@@ -1,15 +1,20 @@
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from './api.service';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private api = inject(ApiService);
+  private auth = inject(AuthService);
 
   async load(): Promise<void> {
     try {
-      const settings: any = await firstValueFrom(this.api.getSettings());
-      this.apply(settings);
+      const principal = this.auth.getPrincipal();
+      if (principal?.role === 'manager' && principal.restaurant_slug) {
+        const settings: any = await firstValueFrom(this.api.getSettings(principal.restaurant_slug));
+        this.apply(settings);
+      }
     } catch {
       // ignore theme load errors
     }

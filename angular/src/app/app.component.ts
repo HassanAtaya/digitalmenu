@@ -12,14 +12,13 @@ import { ToastComponent } from './shared/toast.component';
   <div class="min-h-screen flex flex-col">
     <header class="px-4 py-3 border-b border-white/10 sticky top-0 z-30 bg-black/50 backdrop-blur">
       <div class="max-w-6xl mx-auto flex items-center justify-between">
-        <a class="flex items-center gap-3" [routerLink]="['/digital_menu']">
+        <a class="flex items-center gap-3" [routerLink]="['/login']">
           <i class="pi pi-qrcode text-[var(--luxury-gold)] text-xl"></i>
           <span class="lux-title">Digital Menu</span>
         </a>
         <nav class="flex items-center gap-3 text-sm">
-          <a class="hover:text-[var(--luxury-gold)]" [routerLink]="['/digital_menu']">Menu</a>
-          <a class="hover:text-[var(--luxury-gold)]" [routerLink]="['/products']" *ngIf="isLogged()">Products</a>
-          <a class="hover:text-[var(--luxury-gold)]" [routerLink]="['/settings']" *ngIf="isLogged()">Settings</a>
+          <a class="hover:text-[var(--luxury-gold)]" [routerLink]="['/restaurant']" *ngIf="isAdmin()">Restaurants</a>
+          <a class="hover:text-[var(--luxury-gold)]" [routerLink]="['/restaurant', managerSlug(), 'edit']" *ngIf="isManager()">My Restaurant</a>
           <a class="hover:text-[var(--luxury-gold)]" [routerLink]="['/login']" *ngIf="!isLogged()">Login</a>
           <button class="text-red-300 hover:text-red-400" *ngIf="isLogged()" (click)="logout()">Logout</button>
         </nav>
@@ -38,6 +37,9 @@ export class AppComponent {
   year = new Date().getFullYear();
 
   isLogged() { return this.auth.isAuthenticated(); }
+  isAdmin() { return this.auth.getPrincipal()?.role === 'admin'; }
+  isManager() { return this.auth.getPrincipal()?.role === 'manager'; }
+  managerSlug() { return this.auth.getPrincipal()?.restaurant_slug; }
   logout() { this.auth.logout(); }
 }
 

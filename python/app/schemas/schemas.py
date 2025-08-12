@@ -1,6 +1,13 @@
 from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, Field
+from uuid import UUID
+
+
+class Principal(BaseModel):
+    username: str
+    role: str
+    restaurant_id: Optional[str] = None
 
 
 class Token(BaseModel):
@@ -10,6 +17,9 @@ class Token(BaseModel):
 
 class TokenPayload(BaseModel):
     sub: str
+    role: str
+    restaurant_id: Optional[str] = None
+    restaurant_slug: Optional[str] = None
     exp: int
 
 
@@ -24,6 +34,30 @@ class UserCreate(UserBase):
 class UserOut(UserBase):
     id: int
     created_at: datetime
+class RestaurantBase(BaseModel):
+    name: str
+    username: Optional[str] = None
+    password: Optional[str] = Field(default=None, min_length=4)
+    is_active: bool = True
+
+
+class RestaurantCreate(RestaurantBase):
+    pass
+
+
+class RestaurantOut(BaseModel):
+    id: UUID
+    name: str
+    slug: str
+    logo_image: Optional[str] = None
+    username: Optional[str] = None
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
 
     class Config:
         from_attributes = True
@@ -40,7 +74,9 @@ class SettingBase(BaseModel):
 
 
 class SettingCreate(SettingBase):
-    pass
+    # Optional manager credential changes when saving settings
+    manager_username: Optional[str] = None
+    manager_password: Optional[str] = Field(default=None, min_length=4)
 
 
 class SettingOut(SettingBase):
@@ -48,6 +84,7 @@ class SettingOut(SettingBase):
     logo_path: Optional[str] = None
     barcode_image_path: Optional[str] = None
     updated_at: datetime
+    manager_username: Optional[str] = None
 
     class Config:
         from_attributes = True

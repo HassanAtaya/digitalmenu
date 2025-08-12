@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../core/api.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -8,6 +9,11 @@ import { ApiService } from '../core/api.service';
   imports: [CommonModule],
   template: `
   <section class="w-full p-4 md:p-6 min-h-screen">
+    <div *ngIf="unavailable" class="max-w-xl mx-auto text-center py-16">
+      <h1 class="lux-title mb-2">Temporarily Unavailable</h1>
+      <p class="text-white/70">{{message}}</p>
+    </div>
+    <ng-container *ngIf="!unavailable">
     <div class="flex items-center gap-4 mb-6">
       <img *ngIf="data?.setting?.logo_path" [src]="data.setting.logo_path" class="h-12"/>
       <div class="min-w-0">
@@ -49,12 +55,27 @@ import { ApiService } from '../core/api.service';
         </article>
       </div>
     </div>
+    </ng-container>
   </section>
   `
 })
 export class DigitalMenuComponent implements OnInit {
   private api = inject(ApiService);
-  data: any; active = 0;
-  ngOnInit(): void { this.api.digitalMenu().subscribe(r => this.data = r); }
+  private route = inject(ActivatedRoute);
+  data: any; active = 0; unavailable = false; message = '';
+  ngOnInit(): void {
+    const slug = this.route.snapshot.paramMap.get('slug')!;
+    this.api.digitalMenu(slug).subscribe((r: any) => {
+      if (r?.unavailable) { this.unavailable = true; this.message = r.message || 'Temporarily unavailable'; }
+      this.data = r;
+      this.applyTheme();
+    });
+  }
+
+  applyTheme(){
+    const s = this.data?.setting;
+    if (s?.primary_color) document.documentElement.style.setProperty('--luxury-gold', s.primary_color);
+    if (s?.background_color) { document.documentElement.style.setProperty('--luxury-dark', s.background_color); document.body.style.background = s.background_color; }
+  }
 }
 

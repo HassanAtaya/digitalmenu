@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -24,5 +24,17 @@ export class AuthService {
   getToken() { return localStorage.getItem(this.tokenKey); }
   isAuthenticated() { return !!this.getToken(); }
   logout() { localStorage.removeItem(this.tokenKey); this.router.navigate(['/login']); }
+
+  getPrincipal(): any | null {
+    const token = this.getToken();
+    if (!token) return null;
+    const payload = token.split('.')[1];
+    try {
+      const json = JSON.parse(atob(payload));
+      return json;
+    } catch {
+      return null;
+    }
+  }
 }
 

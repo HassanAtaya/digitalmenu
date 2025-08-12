@@ -37,7 +37,18 @@ export class LoginComponent {
 
   submit() {
     this.auth.login(this.username, this.password).subscribe({
-      next: (res) => { this.auth.setToken(res.access_token); this.toast.success('Welcome back'); this.router.navigate(['/products']); },
+      next: (res) => {
+        this.auth.setToken(res.access_token);
+        const p = this.auth.getPrincipal();
+        this.toast.success('Welcome back');
+        if (p?.role === 'admin') {
+          this.router.navigate(['/restaurant']);
+        } else if (p?.role === 'manager' && p.restaurant_slug) {
+          this.router.navigate(['/restaurant', p.restaurant_slug, 'edit']);
+        } else {
+          this.router.navigate(['/login']);
+        }
+      },
       error: () => this.toast.error('Invalid credentials')
     });
   }

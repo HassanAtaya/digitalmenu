@@ -1,5 +1,18 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Float, ForeignKey, Table, Text, UniqueConstraint
+import uuid
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    DateTime,
+    Float,
+    ForeignKey,
+    Table,
+    Text,
+    UniqueConstraint,
+    Boolean,
+)
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from ..core.database import Base
 
@@ -35,10 +48,29 @@ class User(Base, TimestampMixin):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
 
 
+class Restaurant(Base, TimestampMixin):
+    __tablename__ = "restaurants"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
+    slug: Mapped[str] = mapped_column(String(200), unique=True, nullable=False, index=True)
+    logo_image: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    username: Mapped[str | None] = mapped_column(String(100), unique=True, nullable=True)
+    password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+    # Relationships
+    settings: Mapped[list["Setting"]] = relationship("Setting", back_populates="restaurant", cascade="all, delete-orphan")
+    categories: Mapped[list["Category"]] = relationship("Category", back_populates="restaurant", cascade="all, delete-orphan")
+    products: Mapped[list["Product"]] = relationship("Product", back_populates="restaurant", cascade="all, delete-orphan")
+    ingredients: Mapped[list["Ingredient"]] = relationship("Ingredient", back_populates="restaurant", cascade="all, delete-orphan")
+
+
 class Setting(Base, TimestampMixin):
     __tablename__ = "settings"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    restaurant_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("restaurants.id", ondelete="CASCADE"), nullable=True, index=True)
     company_name: Mapped[str] = mapped_column(String(200), default="")
     logo_path: Mapped[str | None] = mapped_column(String(255), nullable=True)
     currency_1: Mapped[str] = mapped_column(String(10), default="USD")
@@ -49,27 +81,32 @@ class Setting(Base, TimestampMixin):
     primary_color: Mapped[str | None] = mapped_column(String(20), nullable=True)
     background_color: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
+    restaurant: Mapped[Restaurant | None] = relationship("Restaurant", back_populates="settings")
+
 
 class Category(Base, TimestampMixin):
     __tablename__ = "categories"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    restaurant_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("restaurants.id", ondelete="CASCADE"), nullable=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
     image_path: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     products: Mapped[list["Product"]] = relationship(
         secondary=product_categories, back_populates="categories"
     )
 
+    restaurant: Mapped[Restaurant | None] = relationship("Restaurant", back_populates="categories")
+
 
 class Product(Base, TimestampMixin):
     __tablename__ = "products"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    restaurant_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("restaurants.id", ondelete="CASCADE"), nullable=True, index=True)
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     image_path: Mapped[str | None] = mapped_column(String(255), nullable=True)
     price_currency_1: Mapped[float] = mapped_column(Float, nullable=False)
-    price_currency_2: Mapped[float] = mapped_column(Float, nullable=False)
 
     categories: Mapped[list[Category]] = relationship(
         secondary=product_categories, back_populates="products"
@@ -79,16 +116,22 @@ class Product(Base, TimestampMixin):
         secondary=product_ingredients, back_populates="products"
     )
 
+    restaurant: Mapped[Restaurant | None] = relationship("Restaurant", back_populates="products")
+
 
 class Ingredient(Base, TimestampMixin):
     __tablename__ = "ingredients"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
+    restaurant_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("restaurants.id", ondelete="CASCADE"), nullable=True, index=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
     image_path: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     products: Mapped[list[Product]] = relationship(
         secondary=product_ingredients, back_populates="ingredients"
     )
+
+    restaurant: Mapped[Restaurant | None] = relationship("Restaurant", back_populates="ingredients")
+
 
 
