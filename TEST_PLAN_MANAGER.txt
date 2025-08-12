@@ -1,0 +1,127 @@
+Digital Menu - Manager Functional Test Script
+
+Audience: Non-technical manager. Goal: Validate that the Digital Menu works for day-to-day use.
+
+1) Preparation
+- Confirm the web app URL (Frontend): e.g., http://localhost:4200 (or your deployed URL)
+- Confirm the menu API is available (Backend): e.g., http://localhost:8000/api
+- Test account: username admin, password evolusys
+
+2) Success criteria (high-level)
+- You can sign in and out
+- You can configure company settings, colors, currencies, and see them reflected on the public menu
+- You can manage categories, ingredients, and products, including images
+- Public Digital Menu loads without sign-in and shows the right data and theme
+
+3) Sign in and out
+Steps
+1. Open the app URL
+2. Click Login in the header
+3. Enter admin / evolusys and submit
+Expected
+- You land on Products page and see a welcome toast
+- The header shows Products and Settings links
+4. Click Logout
+Expected
+- You return to the Login page and Products/Settings links disappear
+
+4) Settings (branding, currencies, rate)
+Steps
+1. Sign in and go to Settings
+2. Set Company Name (e.g., "Evolusys Bistro")
+3. Set Currency 1 (e.g., USD) and Currency 2 (e.g., EUR)
+4. Set Rate (e.g., 0.9) - this drives automatic price conversion into Currency 2
+5. Pick Primary Color and Background Color
+6. Click Save
+7. Upload a Logo image and a Barcode image
+Expected
+- After Save, a success message appears
+- Logo and barcode images display in the Settings page previews
+- Opening the public Digital Menu shows: company name, currencies, colors applied, and barcode image in the header
+
+5) Categories
+Steps
+1. Go to Products page (signed in)
+2. In the Categories panel, enter a new category name (e.g., "Pasta") and click Add
+3. Select that category row, click Edit, change name (e.g., "Fresh Pasta"), click Update
+4. With the category selected for editing, upload an image
+5. Create a second category (e.g., "Desserts")
+Expected
+- New categories appear in the list
+- Updated name is reflected immediately
+- Category image appears as a small thumbnail
+- On the public Digital Menu, category chips include the new categories
+Business rule
+- A category with linked products cannot be deleted (you will see an error if you try)
+
+6) Ingredients
+Steps
+1. In the Ingredients panel, add a new ingredient (e.g., "Truffle")
+2. Edit its name (e.g., "Black Truffle") and update
+3. With the ingredient selected, upload an image
+4. Add more ingredients (e.g., "Parmesan", "Egg Yolks")
+Expected
+- Ingredients are listed and images visible when uploaded
+Business rule
+- Ingredient names must be unique
+
+7) Products
+Steps (create)
+1. In the Product Editor, enter Name (e.g., "Tagliatelle al Tartufo")
+2. Enter Price (Currency 1), e.g., 50
+3. Choose one or more categories (e.g., Fresh Pasta)
+4. Choose one or more ingredients (e.g., Black Truffle, Parmesan)
+5. Click Add Product
+6. After it appears in the Products table, click Edit, then upload a product image
+Expected
+- Product appears in the list with the name, price in Currency 1 and Currency 2 (auto-computed by Rate), category and ingredient badges, and image once uploaded
+Steps (update)
+7. Click Edit on the product, change price or categories/ingredients, click Update Product
+Expected
+- Price in Currency 2 recalculates using the current Rate
+Steps (delete)
+8. Click Delete, confirm
+Expected
+- Product is removed from the list
+
+8) Public Digital Menu (no sign-in)
+Steps
+1. Log out or use a private window
+2. Visit the Digital Menu page (Menu link or direct /digital_menu)
+3. Use the category chips (All, Fresh Pasta, Desserts, etc.) to filter
+Expected
+- The page loads without sign-in
+- Header shows your logo, company name, currencies, and barcode image
+- Theme applies (Primary Color and Background Color)
+- Each category section lists its products; each product shows name, both prices, and ingredient names
+- Filtering by a category shows only that category's products
+
+9) Persistence and refresh
+Steps
+1. Make any change (e.g., edit Settings or add a Category)
+2. Refresh the page (Ctrl/Cmd+R)
+Expected
+- Changes persist after refresh
+
+10) Business edge cases to spot-check
+- Very long names (category, ingredient, product) display reasonably and do not break the layout
+- Special characters in names are accepted and shown correctly
+- Price at 0.00 is allowed if your policy permits; negative prices should not be used
+- Large image files still upload and show; if too large, the layout should degrade gracefully
+- A category with products cannot be deleted (error message appears); ingredients can be deleted unless linked to a product
+
+11) Security expectations (light check)
+- Products and Settings pages are only accessible when signed in (you are redirected to Login otherwise)
+- The public Digital Menu is accessible without sign-in
+
+12) Pass/Fail checklist (quick summary)
+- Login/Logout works
+- Settings: name/currencies/rate/colors saved and reflected on the public menu
+- Logo and barcode images upload and display; appear on the public menu
+- Category CRUD works; cannot delete a category if linked to products
+- Ingredient CRUD works; unique names; images display
+- Product CRUD works; images display; Currency 2 price updates when Rate changes
+- Public Digital Menu loads without sign-in; filtering works; data and theme are correct
+
+Notes
+- If something does not behave as expected, note the step number, what you did, what you saw, and what you expected to see.
