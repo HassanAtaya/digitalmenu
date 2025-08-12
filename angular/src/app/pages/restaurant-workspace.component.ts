@@ -124,13 +124,20 @@ import { ToastService } from '../shared/toast.service';
       <div class="overflow-auto">
         <table class="min-w-full text-sm">
           <thead class="text-white/60">
-            <tr class="border-b border-white/10"><th class="text-left py-2 pr-3">Product</th><th class="text-left py-2 pr-3">Price</th><th class="text-left py-2 pr-3">Categories</th><th></th></tr>
+            <tr class="border-b border-white/10">
+              <th class="text-left py-2 pr-3">Product</th>
+              <th class="text-left py-2 pr-3">Price</th>
+              <th class="text-left py-2 pr-3">Categories</th>
+              <th class="text-left py-2 pr-3">Ingredients</th>
+              <th></th>
+            </tr>
           </thead>
           <tbody>
             <tr *ngFor="let p of products" class="border-b border-white/5">
               <td class="py-2 pr-3 flex items-center gap-2"><img *ngIf="p.image_path" [src]="p.image_path" class="h-8 w-8 rounded object-cover"/>{{p.name}}</td>
               <td class="py-2 pr-3">{{p.price_currency_1 | number:'1.0-2'}}</td>
               <td class="py-2 pr-3">{{mapNames(p.category_ids, categories).join(', ')}}</td>
+              <td class="py-2 pr-3">{{mapNames(p.ingredient_ids, ingredients).join(', ')}}</td>
               <td class="py-2 text-right space-x-2"><button class="text-xs px-2 py-1 bg-white/10 rounded" (click)="editProduct(p)">Edit</button><button class="text-xs px-2 py-1 bg-red-600/60 rounded" (click)="deleteProduct(p)">Delete</button></td>
             </tr>
           </tbody>
@@ -192,7 +199,10 @@ export class RestaurantWorkspaceComponent implements OnInit {
 
   // Products
   editProduct(p:any){ this.prodModel = { id:p.id, name:p.name, price_currency_1:p.price_currency_1, category_ids:p.category_ids||[], ingredient_ids:p.ingredient_ids||[] }; }
-  saveProduct(){ const data = { name:this.prodModel.name, price_currency_1:+this.prodModel.price_currency_1, category_ids:this.prodModel.category_ids||[], ingredient_ids:this.prodModel.ingredient_ids||[] };
+  saveProduct(){
+    const catIds = (this.prodModel.category_ids || []).map((v:any)=> +v);
+    const ingIds = (this.prodModel.ingredient_ids || []).map((v:any)=> +v);
+    const data = { name: this.prodModel.name, price_currency_1: +this.prodModel.price_currency_1, category_ids: catIds, ingredient_ids: ingIds };
     const op = this.prodModel.id? this.api.updateProduct(this.slug, this.prodModel.id, data): this.api.createProduct(this.slug, data);
     op.subscribe({ next:()=>{ this.prodModel={ name:'', price_currency_1:0, category_ids:[], ingredient_ids:[] }; this.reloadProducts(); this.toast.success('Product saved'); }, error:()=> this.toast.error('Failed') }); }
   deleteProduct(p:any){ this.api.deleteProduct(this.slug, p.id).subscribe({ next:()=>{ this.reloadProducts(); this.toast.success('Product deleted'); }, error:()=> this.toast.error('Failed') }); }
