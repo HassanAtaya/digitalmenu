@@ -10,7 +10,7 @@ import { ToastComponent } from './shared/toast.component';
   imports: [RouterOutlet, RouterLink, NgIf, ToastComponent],
   template: `
   <div class="min-h-screen flex flex-col">
-    <header class="px-4 py-3 border-b border-white/10 sticky top-0 z-30 bg-black/50 backdrop-blur" *ngIf="!isPublicMenu()">
+    <header class="px-4 py-3 border-b border-white/10 sticky top-0 z-30 bg-black/50 backdrop-blur" *ngIf="!isLogin() && !isPublicMenu()">
       <div class="max-w-6xl mx-auto flex items-center justify-between">
         <a class="flex items-center gap-3" [routerLink]="['/login']">
           <i class="pi pi-qrcode text-[var(--luxury-gold)] text-xl"></i>
@@ -48,6 +48,10 @@ export class AppComponent {
     const first = url.replace(/^\//, '').split('/')[0];
     const nonPublic = new Set(['', 'login', 'restaurant']);
     return !nonPublic.has(first);
+  }
+  isLogin() {
+    const url = this.router.url.split('?')[0].split('#')[0];
+    return url === '/login';
   }
 }
 
