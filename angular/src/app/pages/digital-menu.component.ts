@@ -21,6 +21,7 @@ import { ActivatedRoute } from '@angular/router';
         </div>
         <div class="justify-self-center text-center">
           <div class="lux-title truncate">{{data?.setting?.company_name}}</div>
+          <div class="text-xs text-white/70">{{data?.setting?.currency_1}} / {{data?.setting?.currency_2}}</div>
         </div>
         <div class="justify-self-end">
           <img *ngIf="data?.setting?.barcode_image_path" [src]="data?.setting?.barcode_image_path" class="h-12 object-contain"/>
@@ -57,7 +58,7 @@ import { ActivatedRoute } from '@angular/router';
             <div class="p-3">
               <div class="min-w-0">
                 <h3 class="font-semibold text-base truncate">{{p.name}}</h3>
-                <div class="text-white/60 text-xs">{{p.price_currency_1 | number:'1.0-0'}} / {{p.price_currency_2 | number:'1.0-0'}}</div>
+                <div class="text-white/60 text-xs">{{p.price_currency_1 | number:'1.0-0'}} {{data?.setting?.currency_1}} / {{p.price_currency_2 | number:'1.0-0'}} {{data?.setting?.currency_2}}</div>
               </div>
               <div class="mt-1 text-xs text-white/70 overflow-hidden text-ellipsis whitespace-nowrap" *ngIf="p.ingredient_names?.length">Ingredients: {{p.ingredient_names.join(', ')}}</div>
             </div>
