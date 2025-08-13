@@ -10,7 +10,7 @@ import { ToastComponent } from './shared/toast.component';
   imports: [RouterOutlet, RouterLink, NgIf, ToastComponent],
   template: `
   <div class="min-h-screen flex flex-col">
-    <header class="px-4 py-3 border-b border-white/10 sticky top-0 z-30 bg-black/50 backdrop-blur">
+    <header class="px-4 py-3 border-b border-white/10 sticky top-0 z-30 bg-black/50 backdrop-blur" *ngIf="!isPublicMenu()">
       <div class="max-w-6xl mx-auto flex items-center justify-between">
         <a class="flex items-center gap-3" [routerLink]="['/login']">
           <i class="pi pi-qrcode text-[var(--luxury-gold)] text-xl"></i>
@@ -27,13 +27,14 @@ import { ToastComponent } from './shared/toast.component';
     <main class="flex-1">
       <router-outlet></router-outlet>
     </main>
-    <footer class="py-6 text-center text-white/50 text-xs">© {{year}} Digital Menu</footer>
+    <footer class="py-6 text-center text-white/50 text-xs" *ngIf="!isPublicMenu()">© {{year}} Digital Menu</footer>
   </div>
   <app-toast></app-toast>
   `
 })
 export class AppComponent {
   private auth = inject(AuthService);
+  private router = inject(Router);
   year = new Date().getFullYear();
 
   isLogged() { return this.auth.isAuthenticated(); }
@@ -41,5 +42,12 @@ export class AppComponent {
   isManager() { return this.auth.getPrincipal()?.role === 'manager'; }
   managerSlug() { return this.auth.getPrincipal()?.restaurant_slug; }
   logout() { this.auth.logout(); }
+  isPublicMenu() {
+    // Public menu route is any single-segment path like /:slug (not starting with known app routes)
+    const url = this.router.url.split('?')[0].split('#')[0];
+    const first = url.replace(/^\//, '').split('/')[0];
+    const nonPublic = new Set(['', 'login', 'restaurant']);
+    return !nonPublic.has(first);
+  }
 }
 

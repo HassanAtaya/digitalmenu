@@ -14,14 +14,7 @@ import { ActivatedRoute } from '@angular/router';
       <p class="text-white/70">{{message}}</p>
     </div>
     <ng-container *ngIf="!unavailable">
-    <div class="flex items-center gap-4 mb-6">
-      <img *ngIf="data?.setting?.logo_path" [src]="data.setting.logo_path" class="h-12"/>
-      <div class="min-w-0">
-        <h1 class="lux-title">{{data?.setting?.company_name || 'Our Menu'}}</h1>
-        <div class="text-white/60 text-xs">{{data?.setting?.currency_1}} • {{data?.setting?.currency_2}}</div>
-      </div>
-      <img *ngIf="data?.setting?.barcode_image_path" [src]="data.setting.barcode_image_path" class="h-12 ml-auto"/>
-    </div>
+    <!-- Header intentionally hidden for public digital menu -->
 
     <div class="overflow-x-auto mb-5">
       <div class="flex gap-3 min-w-max">
@@ -40,19 +33,24 @@ import { ActivatedRoute } from '@angular/router';
         <img *ngIf="cat.image_path" [src]="cat.image_path" class="h-10 w-10 rounded object-cover"/>
         <h2 class="text-xl font-display" [style.color]="data?.setting?.primary_color || '#C9A24B'">{{cat.name}}</h2>
       </div>
-      <div class="menu-grid">
-        <article *ngFor="let p of cat.products" class="lux-card overflow-hidden max-w-sm mx-auto hover:scale-[1.01] transition">
-          <img *ngIf="p.image_path" [src]="p.image_path" class="w-full h-40 object-cover"/>
-          <div class="p-4">
-            <div class="flex items-start justify-between gap-3">
+      <div class="overflow-x-auto pb-2">
+        <div class="flex gap-3 min-w-max">
+          <article *ngFor="let p of cat.products" class="lux-card overflow-hidden w-44 h-56 flex-shrink-0 hover:scale-[1.01] transition">
+            <ng-container *ngIf="p.image_path; else placeholderImage">
+              <img [src]="p.image_path" class="w-full h-28 object-cover"/>
+            </ng-container>
+            <ng-template #placeholderImage>
+              <div class="w-full h-28 bg-white/5"></div>
+            </ng-template>
+            <div class="p-3">
               <div class="min-w-0">
-                <h3 class="font-semibold text-lg truncate">{{p.name}}</h3>
-                <div class="text-white/60 text-sm">{{p.price_currency_1 | number:'1.0-0'}} / {{p.price_currency_2 | number:'1.0-0'}}</div>
+                <h3 class="font-semibold text-base truncate">{{p.name}}</h3>
+                <div class="text-white/60 text-xs">{{p.price_currency_1 | number:'1.0-0'}} / {{p.price_currency_2 | number:'1.0-0'}}</div>
               </div>
+              <div class="mt-1 text-xs text-white/70 overflow-hidden text-ellipsis whitespace-nowrap" *ngIf="p.ingredient_names?.length">Ingredients: {{p.ingredient_names.join(', ')}}</div>
             </div>
-            <div class="mt-2 text-sm text-white/70" *ngIf="p.ingredient_names?.length">Ingredients: {{p.ingredient_names.join(', ')}}</div>
-          </div>
-        </article>
+          </article>
+        </div>
       </div>
     </div>
     </ng-container>

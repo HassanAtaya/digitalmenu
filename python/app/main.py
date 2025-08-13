@@ -587,9 +587,9 @@ def public_menu(restaurant_slug: str, db: Session = Depends(get_db)):
     ingredients = db.query(Ingredient).filter(Ingredient.restaurant_id == rest.id).order_by(Ingredient.name.asc()).all()
     # Compose DTO optimized for UI
     cat_map = {c.id: {"id": c.id, "name": c.name, "image_path": c.image_path, "products": []} for c in categories}
-    # Link products to categories
+    uncategorized_products: list[dict] = []
+    # Link products to categories and collect uncategorized
     for p in products:
-        # find categories via association table
         rows = db.execute(product_categories.select().where(product_categories.c.product_id == p.id)).fetchall()
         p_cat_ids = [r.category_id for r in rows]
         ing_rows = db.execute(product_ingredients.select().where(product_ingredients.c.product_id == p.id)).fetchall()
@@ -603,9 +603,23 @@ def public_menu(restaurant_slug: str, db: Session = Depends(get_db)):
             "price_currency_2": round(p.price_currency_1 * (setting.rate if setting else 1.0), 2),
             "ingredient_names": p_ingredients,
         }
-        for cid in p_cat_ids:
-            if cid in cat_map:
-                cat_map[cid]["products"].append(p_dto)
+        if not p_cat_ids:
+            uncategorized_products.append(p_dto)
+        else:
+            for cid in p_cat_ids:
+                if cid in cat_map:
+                    cat_map[cid]["products"].append(p_dto)
+
+    categories_out: list[dict] = []
+    if uncategorized_products:
+        categories_out.append({
+            "id": -1,
+            "name": "Uncategorized",
+            "image_path": None,
+            "products": uncategorized_products,
+        })
+    categories_out.extend(list(cat_map.values()))
+
     return {
         "restaurant": {"name": rest.name, "slug": rest.slug, "logo_image": rest.logo_image},
         "setting": {
@@ -617,7 +631,7 @@ def public_menu(restaurant_slug: str, db: Session = Depends(get_db)):
             "primary_color": setting.primary_color if setting else None,
             "background_color": setting.background_color if setting else None,
         },
-        "categories": list(cat_map.values()),
+        "categories": categories_out,
     }
 
 
