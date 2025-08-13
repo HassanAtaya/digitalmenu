@@ -14,7 +14,19 @@ import { ActivatedRoute } from '@angular/router';
       <p class="text-white/70">{{message}}</p>
     </div>
     <ng-container *ngIf="!unavailable">
-    <!-- Header intentionally hidden for public digital menu -->
+    <div class="max-w-6xl mx-auto mb-4 border-b border-white/10">
+      <div class="grid grid-cols-3 items-center py-3">
+        <div class="justify-self-start">
+          <img *ngIf="data?.setting?.logo_path" [src]="data?.setting?.logo_path" class="h-10 object-contain"/>
+        </div>
+        <div class="justify-self-center text-center">
+          <div class="lux-title truncate">{{data?.setting?.company_name}}</div>
+        </div>
+        <div class="justify-self-end">
+          <img *ngIf="data?.setting?.barcode_image_path" [src]="data?.setting?.barcode_image_path" class="h-12 object-contain"/>
+        </div>
+      </div>
+    </div>
 
     <div class="overflow-x-auto mb-5">
       <div class="flex gap-3 min-w-max">
