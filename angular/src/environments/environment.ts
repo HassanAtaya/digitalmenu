@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  api: 'http://localhost:8000/api'
+  apiBase: '/api/v1',
+  api: '/api/v1'
 };
-

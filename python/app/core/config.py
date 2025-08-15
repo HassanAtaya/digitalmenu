@@ -4,7 +4,7 @@ from pydantic import Field
 
 class Settings(BaseSettings):
     app_name: str = "Digital Menu API"
-    api_v1_prefix: str = "/api"
+    api_v1_prefix: str = "/api/v1"
     secret_key: str = Field(default="CHANGE_ME_SECRET", validation_alias="SECRET_KEY")
     access_token_expire_minutes: int = 60 * 24
 
